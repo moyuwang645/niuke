@@ -1,8 +1,10 @@
 package com.nowcoder.community;
 
 import com.nowcoder.community.dao.DiscussPostMapper;
+import com.nowcoder.community.dao.LoginTicketMapping;
 import com.nowcoder.community.dao.UserMapper;
 import com.nowcoder.community.entity.DiscussPost;
+import com.nowcoder.community.entity.LoginTicket;
 import com.nowcoder.community.entity.User;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,6 +26,9 @@ public class MapperTests {
 
     @Autowired
     private DiscussPostMapper disscussPostMapper;
+
+    @Autowired
+    private LoginTicketMapping loginTicketMapping;
 
     @Test
     public void testSelectUser() {
@@ -74,6 +79,25 @@ public class MapperTests {
         System.out.println(rows);
     }
 
+    @Test
+    public void testInsertDiscussPost() {
+        LoginTicket loginTicket = new LoginTicket();
+        loginTicket.setTicket("123456");
+        loginTicket.setExpire(new Date(System.currentTimeMillis()+1600));
+        loginTicket.setStatus(0);
+        loginTicket.setUserId(101);
+        loginTicketMapping.insertLoginTicket(loginTicket);
+    }
+
+    @Test
+    public void testSelectLoginTicket() {
+        LoginTicket loginTicket =new LoginTicket();
+        loginTicket = loginTicketMapping.selectLoginTicket("123456");
+        System.out.println(loginTicket);
+        loginTicketMapping.updateLoginTicket(loginTicket,1);
+        loginTicket = loginTicketMapping.selectLoginTicket("123456");
+        System.out.println(loginTicket);
+    }
 }
 
 
