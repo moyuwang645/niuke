@@ -15,6 +15,6 @@ public interface LoginTicketMapping {
              "from login_ticket where ticket=#{ticket}"})
     LoginTicket selectLoginTicket(String ticket);
     @Update({"update into login_ticket set status=#{status} where ticket=#{ticket}"})
-    int updateLoginTicket(LoginTicket loginTicket, int status);
+    int updateLoginTicket(String ticket, int status);
 
 }

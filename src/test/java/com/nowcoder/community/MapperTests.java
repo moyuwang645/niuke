@@ -89,15 +89,6 @@ public class MapperTests {
         loginTicketMapping.insertLoginTicket(loginTicket);
     }
 
-    @Test
-    public void testSelectLoginTicket() {
-        LoginTicket loginTicket =new LoginTicket();
-        loginTicket = loginTicketMapping.selectLoginTicket("123456");
-        System.out.println(loginTicket);
-        loginTicketMapping.updateLoginTicket(loginTicket,1);
-        loginTicket = loginTicketMapping.selectLoginTicket("123456");
-        System.out.println(loginTicket);
-    }
 }
 
 

@@ -30,6 +30,6 @@ public class MailTests {
         context.setVariable("name","wang");
         String context1 = templateEngine.process("/mail/tetmail",context);
         System.out.println(context1);
-        mailClient.sendMail("junlinw19@gamil.com","Test",context1);
+        mailClient.sendMail("junlinw19@gmail.com","Test",context1);
     }
 }

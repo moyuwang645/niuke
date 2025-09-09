@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" xmlns="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -67,7 +67,7 @@
 					<div class="form-group row">
 						<label for="username" class="col-sm-2 col-form-label text-right">账号:</label>
 						<div class="col-sm-10">
-							<input type="text" th:class="form-control ${usermsg!=null?'is-invalid':''}"
+							<input type="text" th:class="|form-control ${usermsg!=null?'is-invalid':''}|"
                                    th:value="${param.username}"
                                    id="username" name="username" placeholder="请输入您的账号!" required>
 							<div class="invalid-feedback" th:text="${usermsg}">
@@ -78,7 +78,7 @@
 					<div class="form-group row mt-4">
 						<label for="password" class="col-sm-2 col-form-label text-right">密码:</label>
 						<div class="col-sm-10">
-							<input type="password" th:class="form-control ${passwordmsg!=null?'is-invalid':''"
+							<input type="password" th:class="|form-control ${passwordmsg!=null?'is-invalid':''}|"
                                    th:value="${param.password}"
                                    id="password" name="password" placeholder="请输入您的密码!" required>
 							<div class="invalid-feedback" th:text="${passwordmsg}">
@@ -89,7 +89,7 @@
 					<div class="form-group row mt-4">
 						<label for="verifycode" class="col-sm-2 col-form-label text-right">验证码:</label>
 						<div class="col-sm-6">
-							<input type="text" th:class="form-control ${codemsg!=null?'is-invalid':''
+							<input type="text" th:class="|form-control ${codemsg!=null?'is-invalid':''}|"
                                    th:value="${code}"
                                    id="verifycode" name="code" placeholder="请输入验证码!">
 							<div class="invalid-feedback" th:text="${codemsg}">

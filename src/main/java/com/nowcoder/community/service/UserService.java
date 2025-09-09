@@ -123,6 +123,16 @@ public class UserService  implements CommunityConstant {
         loginTicketMapping.insertLoginTicket(loginTicket);
         map.put("ticket",loginTicket.getTicket());
         return map;
+    }
+    public void logout(String ticket){
+        loginTicketMapping.updateLoginTicket(ticket,1);
 
+    }
+    public LoginTicket selectloginticket(String ticket){
+        return loginTicketMapping.selectLoginTicket(ticket);
+    }
+
+    public int updateHesder(int userid,String hesderurl){
+        return userMapper.updateHeader(userid,hesderurl);
     }
 }

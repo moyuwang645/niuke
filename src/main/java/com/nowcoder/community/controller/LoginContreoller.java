@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -31,8 +32,6 @@ public class LoginContreoller implements CommunityConstant {
     private UserService userService;
     @Autowired
     private Producer kaptchaProducer;
-    @Autowired
-    private Response response;
     @Value("${server.servlet.context-path}")
     private String contextPath;
 
@@ -99,7 +98,7 @@ public class LoginContreoller implements CommunityConstant {
     public String login(Model model, String username, String userpwd, boolean remember, HttpSession session
                         , HttpServletRequest request,String code){
         String kaptcha=(String) session.getAttribute("kaptcha");
-
+        Response response= new Response();
         int expiredtime = remember?MAX_REMEMBER_TIME:MAX_REMEMBER_TIME_REMEBER;
         Map<String,Object> map = userService.LoginService(username,userpwd,expiredtime);
         if(map.containsKey("ticket")){
@@ -113,6 +112,11 @@ public class LoginContreoller implements CommunityConstant {
             model.addAttribute("passwordmsg",map.get("passwordmsg"));
             return  "/site/login";
         }
+    }
 
+    @RequestMapping(path="/logout",method = RequestMethod.GET)
+    public String logout(@CookieValue("ticket") String ticket){
+        userService.logout(ticket);
+        return "redirect:/login";
     }
 }
