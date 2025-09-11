@@ -5,13 +5,13 @@ import com.nowcoder.community.entity.User;
 import com.nowcoder.community.service.UserService;
 import com.nowcoder.community.util.CommunityConstant;
 import org.apache.catalina.connector.Response;
-import org.apache.tomcat.util.http.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -42,12 +42,12 @@ public class LoginContreoller implements CommunityConstant {
     }
 
     @RequestMapping(path = "/register",method = RequestMethod.GET)
-    public String geyResgterPage(){
+    public String getResgterPage(){
         return "/site/register";
     }
 
     @RequestMapping(path = "/login",method = RequestMethod.GET)
-    public String geyloginPage(){
+    public String getloginPage(){
         return "/site/login";
     }
     @RequestMapping(path="/register",method = RequestMethod.POST)
@@ -95,16 +95,19 @@ public class LoginContreoller implements CommunityConstant {
     }
 
     @RequestMapping(path="/login",method = RequestMethod.POST)
-    public String login(Model model, String username, String userpwd, boolean remember, HttpSession session
-                        , HttpServletRequest request,String code){
+    public String login(Model model, String username, String password, boolean remember, HttpSession session
+                        , HttpServletResponse response,String code){
         String kaptcha=(String) session.getAttribute("kaptcha");
-        Response response= new Response();
-        int expiredtime = remember?MAX_REMEMBER_TIME:MAX_REMEMBER_TIME_REMEBER;
-        Map<String,Object> map = userService.LoginService(username,userpwd,expiredtime);
+        if(StringUtils.isEmpty(kaptcha)||!kaptcha.equalsIgnoreCase(code)||StringUtils.isEmpty(code)){
+            model.addAttribute("codemsg","验证码不正确");
+            return "/site/login";
+        }
+        int expiredtime = remember?MAX_REMEMBER_TIME_REMEBER:MAX_REMEMBER_TIME;
+        Map<String,Object> map = userService.LoginService(username,password,expiredtime);
         if(map.containsKey("ticket")){
             Cookie ck=new Cookie("ticket",map.get("ticket").toString());
-            ck.setMaxAge(expiredtime);
             ck.setPath(contextPath);
+            ck.setMaxAge(expiredtime);
             response.addCookie(ck);
             return "redirect:/index";
         }else{

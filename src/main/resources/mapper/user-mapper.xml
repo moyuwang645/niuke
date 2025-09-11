@@ -22,6 +22,8 @@
         select <include refid="selectFields"></include>
         from user
         where username = #{username}
+        ORDER BY id DESC
+        Limit 1
     </select>
 
     <select id="selectByEmail" resultType="User">

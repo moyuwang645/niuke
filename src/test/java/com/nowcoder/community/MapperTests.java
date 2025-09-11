@@ -6,6 +6,7 @@ import com.nowcoder.community.dao.UserMapper;
 import com.nowcoder.community.entity.DiscussPost;
 import com.nowcoder.community.entity.LoginTicket;
 import com.nowcoder.community.entity.User;
+import com.nowcoder.community.util.CommunityUtil;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,10 +46,11 @@ public class MapperTests {
     @Test
     public void testInsertUser() {
         User user = new User();
-        user.setUsername("test");
-        user.setPassword("123456");
+        user.setUsername("test12");
+        user.setPassword(CommunityUtil.md5("12345612"+"abc"));
         user.setSalt("abc");
         user.setEmail("test@qq.com");
+        user.setStatus(1);
         user.setHeaderUrl("http://www.nowcoder.com/101.png");
         user.setCreateTime(new Date());
 

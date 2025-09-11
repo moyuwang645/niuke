@@ -8,8 +8,8 @@ public class DiscussPost {
     private int userid;
     private String title;
     private String content;
-    private int type;
-    private int status;
+    private int type = 0;
+    private int status = 0;
     private Date createTime;
     private int commentCount;
     private double score;

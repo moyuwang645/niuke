@@ -9,5 +9,7 @@ import java.util.List;
 public interface DiscussPostMapper {
     List<DiscussPost> SelectDiscussPost(int userId,int offset,int limit);
     int SelectDiscussPostRows(@Param("userId") int userId);
+    int insertDiscussPost(DiscussPost discussPost);
+    DiscussPost SelectDiscussPostById(int id);
 
 }
