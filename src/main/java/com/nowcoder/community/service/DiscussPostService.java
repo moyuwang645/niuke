@@ -33,4 +33,8 @@ public class DiscussPostService {
     public DiscussPost getDiscussPostById(int id){
         return disscussPostMapper.SelectDiscussPostById(id);
     }
+
+    public int updateCommentCount(int id, int commentCount){
+        return disscussPostMapper.updateCommentCount(id,commentCount);
+    }
 }
