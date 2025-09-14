@@ -135,4 +135,7 @@ public class UserService  implements CommunityConstant {
     public int updateHesder(int userid,String hesderurl){
         return userMapper.updateHeader(userid,hesderurl);
     }
+    public User getUserByName(String username) {
+        return userMapper.selectByName(username);
+    }
 }
