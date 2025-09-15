@@ -7,6 +7,7 @@ import com.nowcoder.community.entity.Page;
 import com.nowcoder.community.entity.User;
 import com.nowcoder.community.service.CommentService;
 import com.nowcoder.community.service.DiscussPostService;
+import com.nowcoder.community.service.LikeService;
 import com.nowcoder.community.service.UserService;
 import com.nowcoder.community.util.CommunityUtil;
 import com.nowcoder.community.util.HostHolder;
@@ -34,7 +35,8 @@ public class DiscussPostController {
     private UserService userService;
     @Autowired
     private CommentService commentService;
-
+    @Autowired
+    private LikeService likeService;
     @RequestMapping(value = "/add",method = RequestMethod.POST)
     @ResponseBody
     public String addPost(String content,String title){
@@ -56,6 +58,11 @@ public class DiscussPostController {
         model.addAttribute("discussPost",discussPost);
         User user= userService.getUserByUserid(discussPost.getUserid());
         model.addAttribute("user",user);
+        int likeCount=likeService.likeCount(CommentType,discussPost.getId());
+        int likeStatus=hostHolder.getUser()==null?0:
+                likeService.findLikeStatus(hostHolder.getUser().getId(),CommentType,discussPost.getId());
+        model.addAttribute("likeCount",likeCount);
+        model.addAttribute("likeStatus",likeStatus);
         page.setLimit(5);
         page.setPath("/discuss/detail/"+discussPostId);
         page.setRows(discussPost.getCommentCount());
@@ -68,6 +75,11 @@ public class DiscussPostController {
                 Map<String,Object> commentVO=new HashMap<>();
                 commentVO.put("comment",comment);
                 commentVO.put("user",userService.getUserByUserid(comment.getUserId()));
+                likeCount=likeService.likeCount(CommentType,comment.getId());
+                likeStatus=hostHolder.getUser()==null?0:
+                        likeService.findLikeStatus(hostHolder.getUser().getId(),CommentType,comment.getId());
+                commentVO.put("likeCount",likeCount);
+                commentVO.put("likeStatus",likeStatus);
                 List<Comment> replyList=commentService.findCommentService(
                         ReplyType,comment.getId(),0,Integer.MAX_VALUE
                 );
@@ -79,6 +91,11 @@ public class DiscussPostController {
                         replyVO.put("user",userService.getUserByUserid(reply.getUserId()));
                         User target=reply.getTargetId()==0?null:userService.getUserByUserid(reply.getTargetId());
                         replyVO.put("target",target);
+                        likeCount=likeService.likeCount(CommentType,reply.getId());
+                        likeStatus=hostHolder.getUser()==null?0:
+                                likeService.findLikeStatus(hostHolder.getUser().getId(),CommentType,reply.getId());
+                        replyVO.put("likeCount",likeCount);
+                        replyVO.put("likeStatus",likeStatus);
                         replyVOList.add(replyVO);
                     }
                 commentVO.put("replys",replyVOList);
