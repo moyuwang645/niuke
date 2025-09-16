@@ -2,7 +2,10 @@ package com.nowcoder.community.controller;
 
 import com.nowcoder.community.LoginRequired;
 import com.nowcoder.community.entity.User;
+import com.nowcoder.community.service.FollowService;
+import com.nowcoder.community.service.LikeService;
 import com.nowcoder.community.service.UserService;
+import com.nowcoder.community.util.CommunityConstant;
 import com.nowcoder.community.util.CommunityUtil;
 import com.nowcoder.community.util.HostHolder;
 import org.slf4j.Logger;
@@ -25,7 +28,7 @@ import java.io.OutputStream;
 
 @Controller
 @RequestMapping(path = "/user")
-public class UserController {
+public class UserController implements CommunityConstant {
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
     @Value("S{community.path.update}")
     private String updatePath;
@@ -37,7 +40,10 @@ public class UserController {
     private UserService userService;
     @Autowired
     private HostHolder hostHolder;
-
+    @Autowired
+    private LikeService likeService;
+    @Autowired
+    private FollowService followService;
     @LoginRequired
     @RequestMapping(value = "/setting",method = RequestMethod.GET)
     public String getSettingPage(){
@@ -85,7 +91,25 @@ public class UserController {
         }catch (IOException e){
             logger.error("头像读取失败"+e.getMessage());
         }
-
     }
-
+    @RequestMapping(path = "/profile/{userId}",method = RequestMethod.GET)
+    public String getProfilePage(@PathVariable("userId") int userId,Model model){
+        User user=hostHolder.getUser();
+        if(user==null){
+            throw new RuntimeException("该用户不存在");
+        }
+        model.addAttribute("user",user);
+        int likeCount=likeService.findLikeCount(userId);
+        model.addAttribute("likeCount",likeCount);
+        int followeeCount=followService.followeeCount(userId,UserType);
+        model.addAttribute("followeeCount",followeeCount);
+        int followerCount=followService.followerCount(UserType,userId);
+        model.addAttribute("followerCount",followerCount);
+        boolean isFollowed=false;
+        if(hostHolder.getUser()==null){
+            isFollowed=followService.isFollow(hostHolder.getUser().getId(),UserType,userId);
+        }
+        model.addAttribute("isFollowed",isFollowed);
+        return "/site/profile";
+    }
 }

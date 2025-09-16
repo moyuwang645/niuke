@@ -22,7 +22,7 @@ public class LikeContorller {
     private HostHolder hostHolder;
     @RequestMapping(path = "/like",method = RequestMethod.POST)
     @ResponseBody
-    public String like(int entityType,int entityId){
+    public String like(int entityType,int entityId,int entityUserId){
         User user=hostHolder.getUser();
         likeService.like(user.getId(),entityType,entityId);
         int likecount=likeService.likeCount(entityType,entityId);

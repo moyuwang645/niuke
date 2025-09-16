@@ -8,4 +8,5 @@ public interface CommunityConstant {
     int MAX_REMEMBER_TIME_REMEBER=3600*24*100;
     int CommentType=1;
     int ReplyType=2;
+    int UserType=3;
 }
