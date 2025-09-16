@@ -58,8 +58,8 @@ public class DiscussPostController {
         model.addAttribute("discussPost",discussPost);
         User user= userService.getUserByUserid(discussPost.getUserid());
         model.addAttribute("user",user);
-        int likeCount=likeService.likeCount(CommentType,discussPost.getId());
-        int likeStatus=hostHolder.getUser()==null?0:
+        long likeCount=likeService.likeCount(CommentType,discussPost.getId());
+        long likeStatus=hostHolder.getUser()==null?0:
                 likeService.findLikeStatus(hostHolder.getUser().getId(),CommentType,discussPost.getId());
         model.addAttribute("likeCount",likeCount);
         model.addAttribute("likeStatus",likeStatus);

@@ -40,11 +40,11 @@ public class FollowService {
         });{
         }
     }
-    public int followeeCount(int userId,int entityType){
+    public long followeeCount(int userId,int entityType){
         String followeeKey=RedisUtil.getFollowee(userId,entityType);
         return redisTemplate.opsForZSet().zCard(followeeKey);
     }
-    public int followerCount(int entityType,int entityId){
+    public long followerCount(int entityType,int entityId){
         String followerKey=RedisUtil.getFollower(entityType,entityId);
         return redisTemplate.opsForZSet().zCard(followerKey);
     }

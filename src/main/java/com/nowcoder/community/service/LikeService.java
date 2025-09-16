@@ -6,6 +6,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.SessionCallback;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -13,7 +14,7 @@ public class LikeService {
     @Autowired
     private RedisTemplate redisTemplate;
     public void like(int userId,int entityType,int entityId,int entityuUserId){
-        redisTemplate.execute(new RedisCallback() {
+        redisTemplate.execute(new SessionCallback() {
             @Override
             public Object execute(RedisOperations operations) throws DataAccessException {
                 String likeEntityKey=RedisUtil.getEntityLike(entityType,entityId);
@@ -31,7 +32,7 @@ public class LikeService {
             }
         });
     }
-    public int likeCount(int entityType,int entityId){
+    public long likeCount(int entityType,int entityId){
         String likeEntityKey=RedisUtil.getEntityLike(entityType,entityId);
         return redisTemplate.opsForSet().size(likeEntityKey);
     }

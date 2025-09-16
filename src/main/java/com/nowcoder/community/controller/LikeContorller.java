@@ -24,8 +24,8 @@ public class LikeContorller {
     @ResponseBody
     public String like(int entityType,int entityId,int entityUserId){
         User user=hostHolder.getUser();
-        likeService.like(user.getId(),entityType,entityId);
-        int likecount=likeService.likeCount(entityType,entityId);
+        likeService.like(user.getId(),entityType,entityId,entityUserId);
+        long likecount=likeService.likeCount(entityType,entityId);
         int likeStatus=likeService.findLikeStatus(user.getId(),entityType,entityId);
         Map<String,Object> map=new HashMap<>();
         map.put("likeCount",likecount);

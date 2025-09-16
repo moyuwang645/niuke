@@ -101,9 +101,9 @@ public class UserController implements CommunityConstant {
         model.addAttribute("user",user);
         int likeCount=likeService.findLikeCount(userId);
         model.addAttribute("likeCount",likeCount);
-        int followeeCount=followService.followeeCount(userId,UserType);
+        Long followeeCount=followService.followeeCount(userId,UserType);
         model.addAttribute("followeeCount",followeeCount);
-        int followerCount=followService.followerCount(UserType,userId);
+        Long followerCount=followService.followerCount(UserType,userId);
         model.addAttribute("followerCount",followerCount);
         boolean isFollowed=false;
         if(hostHolder.getUser()==null){
