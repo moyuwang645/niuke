@@ -13,4 +13,8 @@ public interface MessageMapper {
     int selectLetterUnreadCount(int userId,String conversationId);
     int insertMessage(Message message);
     int updateStatus(List<Integer> ids,int status);
+    Message selectLastNotice(int userId,String topic);
+    int selectNoticeUnreadCount(int userId,String topic);
+    int selectNoticeCount(int userId,String topic);
+    List<Message> selectNotice(int userId,String topic,int offset,int limit);
 }

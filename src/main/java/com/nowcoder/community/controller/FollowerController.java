@@ -1,7 +1,9 @@
 package com.nowcoder.community.controller;
 
+import com.nowcoder.community.entity.Event;
 import com.nowcoder.community.entity.Page;
 import com.nowcoder.community.entity.User;
+import com.nowcoder.community.event.EventProducer;
 import com.nowcoder.community.service.FollowService;
 import com.nowcoder.community.util.CommunityConstant;
 import com.nowcoder.community.util.CommunityUtil;
@@ -14,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -24,11 +25,19 @@ public class FollowerController implements CommunityConstant {
     private FollowService followService;
     @Autowired
     private HostHolder hostHolder;
+    @Autowired
+    private EventProducer eventProducer;
     @RequestMapping(path = "/follow",method = RequestMethod.POST)
     @ResponseBody
     public String follow(int entityType,int entityId){
         User user=hostHolder.getUser();
         followService.Follow(user.getId(),entityType,entityId);
+        Event event = new Event().
+                setTopic(Follow)
+                .setEntityId(entityId)
+                .setEntityType(entityType)
+                .setEntityUserId(user.getId());
+        eventProducer.fireEvent(event);
         return CommunityUtil.getJSONString(0,"已关注");
     }
     @RequestMapping(path = "/Unfollow",method = RequestMethod.POST)
@@ -50,8 +59,8 @@ public class FollowerController implements CommunityConstant {
         List<Map<String,Object>> followerList=followService.getFollowee(userId,page.getOffset(),page.getLimit());
         if(followerList==null){
             for(Map<String,Object> map:followerList){
-                User user=(User)map.get("user");
-                map.put("Followed",isFollow(user.getId()));
+                User u=(User)map.get("user");
+                map.put("Followed",isFollow(u.getId()));
             }
         }
         model.addAttribute("followerList",followerList);
@@ -69,8 +78,8 @@ public class FollowerController implements CommunityConstant {
         List<Map<String,Object>> followerList=followService.getFollower(userId,page.getOffset(),page.getLimit());
         if(followerList==null){
             for(Map<String,Object> map:followerList){
-                User user=(User)map.get("user");
-                map.put("Followed",isFollow(user.getId()));
+                User u=(User)map.get("user");
+                map.put("Followed",isFollow(u.getId()));
             }
         }
         model.addAttribute("followerList",followerList);

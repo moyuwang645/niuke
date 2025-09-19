@@ -9,4 +9,8 @@ public interface CommunityConstant {
     int CommentType=1;
     int ReplyType=2;
     int UserType=3;
+    String Comment="comment";
+    String Like="like";
+    String Follow="follow";
+    int SystemId=1;
 }

@@ -69,10 +69,10 @@ public class FollowService implements CommunityConstant {
         List<Map<String,Object>> followeeList=new ArrayList<Map<String,Object>>();
         for(Integer id:ids){
             Map<String,Object> map=new HashMap<>();
-            User user=userService.getUserByUserid(userId)
+            User user=userService.getUserByUserid(userId);
             map.put("user",user);
-            Double score=redisTemplate.opsForZSet().score(followeeKey,id);
-            map.put("followTime",new Date(score));
+            double score=redisTemplate.opsForZSet().score(followeeKey,id);
+            map.put("followTime",new Date((long)score));
             followeeList.add(map);
         }
         return followeeList;
@@ -86,10 +86,10 @@ public class FollowService implements CommunityConstant {
         List<Map<String,Object>> followerList=new ArrayList<Map<String,Object>>();
         for(Integer id:ids){
             Map<String,Object> map=new HashMap<>();
-            User user=userService.getUserByUserid(userId)
+            User user=userService.getUserByUserid(userId);
             map.put("user",user);
-            Double score=redisTemplate.opsForZSet().score(followerKey,id);
-            map.put("followTime",new Date(score));
+            double score=redisTemplate.opsForZSet().score(followerKey,id);
+            map.put("followTime",new Date((long)score));
             followerList.add(map);
         }
         return followerList;

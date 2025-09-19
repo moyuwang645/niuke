@@ -7,7 +7,7 @@ public class RedisUtil {
     private static final String PREFIX_FOLLOWER="Follower:";
     private static final String PREFIX_FOLLOWEE="Followee:";
     public static String getEntityLike(int entityType,int entityId){
-        return PREFIX_ENTITY_LIKE+split=entityType+split+entityId;
+        return PREFIX_ENTITY_LIKE+split+entityType+split+entityId;
     }
     public static String getUserLike(int userId){
         return PREFIX_USER_LIKE+split+userId;
