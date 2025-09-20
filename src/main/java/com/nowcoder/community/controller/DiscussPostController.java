@@ -1,10 +1,8 @@
 package com.nowcoder.community.controller;
 
 import com.nowcoder.community.dao.DiscussPostMapper;
-import com.nowcoder.community.entity.Comment;
-import com.nowcoder.community.entity.DiscussPost;
-import com.nowcoder.community.entity.Page;
-import com.nowcoder.community.entity.User;
+import com.nowcoder.community.entity.*;
+import com.nowcoder.community.event.EventProducer;
 import com.nowcoder.community.service.CommentService;
 import com.nowcoder.community.service.DiscussPostService;
 import com.nowcoder.community.service.LikeService;
@@ -21,8 +19,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.*;
 
-import static com.nowcoder.community.util.CommunityConstant.CommentType;
-import static com.nowcoder.community.util.CommunityConstant.ReplyType;
+import static com.nowcoder.community.util.CommunityConstant.*;
 
 @Controller
 @RequestMapping(path = "discuss")
@@ -37,6 +34,8 @@ public class DiscussPostController {
     private CommentService commentService;
     @Autowired
     private LikeService likeService;
+    @Autowired
+    private EventProducer eventProducer;
     @RequestMapping(value = "/add",method = RequestMethod.POST)
     @ResponseBody
     public String addPost(String content,String title){
@@ -50,6 +49,12 @@ public class DiscussPostController {
         discussPost.setContent(content);
         discussPost.setCreateTime(new Date());
         discussPostService.addDiscussPost(discussPost);
+        Event addEvent = new Event()
+                .setTopic(Publish)
+                .setUserId(user.getId())
+                .setEntityType(CommentType)
+                .setEntityId(discussPost.getId());
+        eventProducer.fireEvent(addEvent);
         return CommunityUtil.getJSONString(0,"发布成功");
     }
     @RequestMapping(value = "/detail/{discussPostId}",method = RequestMethod.GET)

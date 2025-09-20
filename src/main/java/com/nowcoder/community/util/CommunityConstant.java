@@ -12,5 +12,6 @@ public interface CommunityConstant {
     String Comment="comment";
     String Like="like";
     String Follow="follow";
+    String Publish="publish";
     int SystemId=1;
 }
