@@ -14,8 +14,8 @@ public class DiscussPostService {
     private DiscussPostMapper disscussPostMapper;
     @Autowired
     private SensitiveFilter sensitiveFilter;
-    public List<DiscussPost> getDisscussPostMapper(int userId, int offset, int limit) {
-        return disscussPostMapper.SelectDiscussPost(userId,offset,limit);
+    public List<DiscussPost> getDisscussPostMapper(int userId, int offset, int limit,int orderMode) {
+        return disscussPostMapper.SelectDiscussPost(userId,offset,limit,orderMode);
     }
     public int getDisscussPostMapperCount(int userId) {
         return disscussPostMapper.SelectDiscussPostRows(userId);
@@ -36,5 +36,16 @@ public class DiscussPostService {
 
     public int updateCommentCount(int id, int commentCount){
         return disscussPostMapper.updateCommentCount(id,commentCount);
+    }
+
+    public int updataType(int id, int type){
+        return disscussPostMapper.updateType(id,type);
+    }
+
+    public int updataStatus(int id, int status){
+        return disscussPostMapper.updateStatus(id,status);
+    }
+    public int updataScore(int id, double score){
+        return disscussPostMapper.updateScore(id,score);
     }
 }

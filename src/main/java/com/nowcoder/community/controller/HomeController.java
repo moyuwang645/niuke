@@ -13,6 +13,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import com.nowcoder.community.entity.DiscussPost;
+import org.springframework.web.bind.annotation.RequestParam;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -29,10 +31,11 @@ public class HomeController implements CommunityConstant {
     @Autowired
     private HostHolder hostHolder;
     @RequestMapping(path="/index",method = RequestMethod.GET)
-    public String getindex(Model model, Page page){
+    public String getindex(Model model, Page page,
+                           @RequestParam(value = "orderMode",defaultValue = "0") int orderMode) {
         page.setRows(discussPostService.getDisscussPostMapperCount(0));
-        page.setPath("/index");
-        List<DiscussPost> list=discussPostService.getDisscussPostMapper(0, page.getOffset(), page.getLimit());
+        page.setPath("/index?orderMode="+orderMode);
+        List<DiscussPost> list=discussPostService.getDisscussPostMapper(0, page.getOffset(), page.getLimit(), orderMode);
         List<Map<String, Object>> discussPosts=new ArrayList<>();
         if(list!=null){
             for(DiscussPost post:list){
@@ -48,8 +51,12 @@ public class HomeController implements CommunityConstant {
             }
         }
         model.addAttribute("discussPosts",discussPosts);
+        model.addAttribute("orderMode",orderMode);
         return "/index";
     }
-
+    @RequestMapping(path = "/denied",method = RequestMethod.GET)
+    public String getDenied(){
+        return "/error/404";
+    }
 
 }

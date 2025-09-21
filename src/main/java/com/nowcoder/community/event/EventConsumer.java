@@ -8,6 +8,7 @@ import com.nowcoder.community.service.DiscussPostService;
 import com.nowcoder.community.service.ElasticsearchService;
 import com.nowcoder.community.service.MessageService;
 import com.nowcoder.community.util.CommunityConstant;
+import com.nowcoder.community.util.HostHolder;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +29,9 @@ public class EventConsumer implements CommunityConstant {
     private DiscussPostService discussPostService;
     @Autowired
     private ElasticsearchService elasticsearchService;
+    @Autowired
+    private HostHolder hostHolder;
+
     @KafkaListener(topics={Comment,Follow,Like})
     public void handleMessage(ConsumerRecord record) {
         if(record.value()==null||record==null){
@@ -69,5 +73,19 @@ public class EventConsumer implements CommunityConstant {
         }
         DiscussPost discussPost = discussPostService.getDiscussPostById(event.getEntityId());
         elasticsearchService.saveDiscussPost(discussPost);
+    }
+
+    @KafkaListener(topics = {Delete})
+    public void handleDelete(ConsumerRecord record) {
+        if(record.value()==null||record==null){
+            logger.error("消息为空");
+            return;
+        }
+        Event event = JSONObject.parseObject(record.value().toString(), Event.class);
+        if(event==null){
+            logger.error("格式错误");
+            return;
+        }
+        elasticsearchService.deleteDiscussPost(event.getEntityId());
     }
 }

@@ -35,8 +35,8 @@ public class ElasticsearchService {
     public void saveDiscussPost(DiscussPost discussPost) {
         discussPostRepository.save(discussPost);
     }
-    public void deleteDiscussPost(DiscussPost discussPost) {
-        discussPostRepository.delete(discussPost);
+    public void deleteDiscussPost(int id) {
+        discussPostRepository.deleteById(id);
     }
     public Page<DiscussPost> findDiscussPostById(String key, int current,int limit) {
         SearchQuery searchQuery = new NativeSearchQueryBuilder()

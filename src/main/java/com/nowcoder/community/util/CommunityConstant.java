@@ -13,5 +13,9 @@ public interface CommunityConstant {
     String Like="like";
     String Follow="follow";
     String Publish="publish";
+    String Delete="delete";
     int SystemId=1;
+    String AuthorityUser="user";
+    String AuthorityAdmin="admin";
+    String AuthorityModerator="moderator";
 }

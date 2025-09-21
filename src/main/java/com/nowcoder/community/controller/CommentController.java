@@ -9,7 +9,9 @@ import com.nowcoder.community.service.CommentService;
 import com.nowcoder.community.service.DiscussPostService;
 import com.nowcoder.community.util.CommunityConstant;
 import com.nowcoder.community.util.HostHolder;
+import com.nowcoder.community.util.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,7 +30,8 @@ public class CommentController implements CommunityConstant {
     private DiscussPostService discussPostService;
     @Autowired
     private EventProducer eventProducer;
-
+    @Autowired
+    private RedisTemplate redisTemplate;
     @RequestMapping(path="/add/{discussPostId}",method = RequestMethod.POST)
     public String addComment(@PathVariable("discussPostId") int discussPostId, Comment comment){
         comment.setUserId(hostHolder.getUser().getId());
@@ -48,13 +51,16 @@ public class CommentController implements CommunityConstant {
             event.setEntityUserId(recomment.getUserId());
         }
         eventProducer.fireEvent(event);
-
-        Event addEvent = new Event()
-                .setTopic(Publish)
-                .setUserId(comment.getUserId())
-                .setEntityType(CommentType)
-                .setEntityId(discussPostId);
-        eventProducer.fireEvent(addEvent);
+        if(comment.getEntityType()==CommentType){
+            Event addEvent = new Event()
+                    .setTopic(Publish)
+                    .setUserId(comment.getUserId())
+                    .setEntityType(CommentType)
+                    .setEntityId(discussPostId);
+            eventProducer.fireEvent(addEvent);
+        }
+        String redisKey= RedisUtil.getPostScore();
+        redisTemplate.opsForSet().add(redisKey, discussPostId);
         return "redirect:/discuss/detail/"+discussPostId;
 
     }

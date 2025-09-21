@@ -8,7 +8,9 @@ import com.nowcoder.community.service.LikeService;
 import com.nowcoder.community.util.CommunityConstant;
 import com.nowcoder.community.util.CommunityUtil;
 import com.nowcoder.community.util.HostHolder;
+import com.nowcoder.community.util.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -25,6 +27,8 @@ public class LikeContorller implements CommunityConstant {
     private HostHolder hostHolder;
     @Autowired
     private EventProducer eventProducer;
+    @Autowired
+    private RedisTemplate redisTemplate;
     @RequestMapping(path = "/like",method = RequestMethod.POST)
     @ResponseBody
     public String like(int entityType,int entityId,int entityUserId){
@@ -44,6 +48,10 @@ public class LikeContorller implements CommunityConstant {
                     .setMap("postId",entityId)
                     .setTopic(Like);
             eventProducer.fireEvent(event);
+        }
+        if(entityType==CommentType){
+            String redisKey= RedisUtil.getPostScore();
+            redisTemplate.opsForSet().add(redisKey, entityId);
         }
         return CommunityUtil.getJSONString(0,null,map);
     }

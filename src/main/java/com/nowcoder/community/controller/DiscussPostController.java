@@ -9,7 +9,9 @@ import com.nowcoder.community.service.LikeService;
 import com.nowcoder.community.service.UserService;
 import com.nowcoder.community.util.CommunityUtil;
 import com.nowcoder.community.util.HostHolder;
+import com.nowcoder.community.util.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -36,6 +38,8 @@ public class DiscussPostController {
     private LikeService likeService;
     @Autowired
     private EventProducer eventProducer;
+    @Autowired
+    private RedisTemplate redisTemplate;
     @RequestMapping(value = "/add",method = RequestMethod.POST)
     @ResponseBody
     public String addPost(String content,String title){
@@ -55,6 +59,8 @@ public class DiscussPostController {
                 .setEntityType(CommentType)
                 .setEntityId(discussPost.getId());
         eventProducer.fireEvent(addEvent);
+        String redisKey= RedisUtil.getPostScore();
+        redisTemplate.opsForSet().add(redisKey, discussPost.getId());
         return CommunityUtil.getJSONString(0,"发布成功");
     }
     @RequestMapping(value = "/detail/{discussPostId}",method = RequestMethod.GET)
@@ -111,5 +117,44 @@ public class DiscussPostController {
         }
         model.addAttribute("comments",commentVOList);
         return "site/discuss-detail";
+    }
+
+    @RequestMapping(path = "/top",method = RequestMethod.POST)
+    @ResponseBody
+    public String setTop(int id){
+        discussPostService.updataType(id,1);
+        Event addEvent = new Event()
+                .setTopic(Publish)
+                .setUserId(hostHolder.getUser().getId())
+                .setEntityType(CommentType)
+                .setEntityId(id);
+        eventProducer.fireEvent(addEvent);
+        return CommunityUtil.getJSONString(0);
+    }
+    @RequestMapping(path = "/wonderful",method = RequestMethod.POST)
+    @ResponseBody
+    public String setWonderful(int id){
+        discussPostService.updataStatus(id,1);
+        Event addEvent = new Event()
+                .setTopic(Publish)
+                .setUserId(hostHolder.getUser().getId())
+                .setEntityType(CommentType)
+                .setEntityId(id);
+        eventProducer.fireEvent(addEvent);
+        String redisKey= RedisUtil.getPostScore();
+        redisTemplate.opsForSet().add(redisKey, discussPost.getId());
+        return CommunityUtil.getJSONString(0);
+    }
+    @RequestMapping(path = "/delete",method = RequestMethod.POST)
+    @ResponseBody
+    public String setDelete(int id){
+        discussPostService.updataStatus(id,2);
+        Event addEvent = new Event()
+                .setTopic(Delete)
+                .setUserId(hostHolder.getUser().getId())
+                .setEntityType(CommentType)
+                .setEntityId(id);
+        eventProducer.fireEvent(addEvent);
+        return CommunityUtil.getJSONString(0);
     }
 }

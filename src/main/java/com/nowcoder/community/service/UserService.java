@@ -9,16 +9,14 @@ import com.nowcoder.community.util.CommunityUtil;
 import com.nowcoder.community.util.MailClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
 import javax.xml.crypto.Data;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 @Service
 public class UserService  implements CommunityConstant {
@@ -137,5 +135,24 @@ public class UserService  implements CommunityConstant {
     }
     public User getUserByName(String username) {
         return userMapper.selectByName(username);
+    }
+
+    public Collection<? extends GrantedAuthority> getAuthorities(int userid) {
+        User user=userMapper.selectById(userid);
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(new GrantedAuthority() {
+            @Override
+            public String getAuthority() {
+                switch (user.getType()) {
+                    case 1:
+                        return AuthorityAdmin;
+                    case 2:
+                        return AuthorityModerator;
+                    default:
+                        return AuthorityUser;
+                }
+                return authorities;
+            }
+        })
     }
 }
