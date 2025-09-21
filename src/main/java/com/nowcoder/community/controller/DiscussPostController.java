@@ -142,7 +142,7 @@ public class DiscussPostController {
                 .setEntityId(id);
         eventProducer.fireEvent(addEvent);
         String redisKey= RedisUtil.getPostScore();
-        redisTemplate.opsForSet().add(redisKey, discussPost.getId());
+        redisTemplate.opsForSet().add(redisKey, id);
         return CommunityUtil.getJSONString(0);
     }
     @RequestMapping(path = "/delete",method = RequestMethod.POST)

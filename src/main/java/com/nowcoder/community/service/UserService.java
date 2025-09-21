@@ -151,8 +151,8 @@ public class UserService  implements CommunityConstant {
                     default:
                         return AuthorityUser;
                 }
-                return authorities;
             }
-        })
+        });
+        return authorities;
     }
 }
