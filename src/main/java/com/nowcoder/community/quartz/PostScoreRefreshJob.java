@@ -14,10 +14,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.BoundSetOperations;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Controller;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
+@Controller
 public class PostScoreRefreshJob implements Job, CommunityConstant {
     private static Logger logger = LoggerFactory.getLogger(PostScoreRefreshJob.class);
     @Autowired
@@ -46,7 +47,7 @@ public class PostScoreRefreshJob implements Job, CommunityConstant {
         }
         logger.info("正在运算"+boundSetOps.size());
         while (boundSetOps.size() > 0) {
-            this.refresh((Integer)boundSetOps.pop())
+            this.refresh((Integer)boundSetOps.pop());
         }
         logger.info("结束运算");
     }
