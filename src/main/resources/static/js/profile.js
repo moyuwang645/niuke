@@ -4,30 +4,17 @@ $(function(){
 
 function follow() {
 	var btn = this;
-    if($(btn).hasClass("btn-info")) {
+    var path = $(btn).hasClass("btn-info") ? "/follow" : "/unfollow";
     $.post(
-        CONTEXT_PATH + "/follow",
+        CONTEXT_PATH + path,
         {"entityType":3,"entityId":$(btn).prev().val()},
         function(data){
-            data = JSON.parse(data);
-            if(data.code==0){
+            if(data.code === 0){
                 window.location.reload();
             }else {
                 alert(data.msg);
             }
-        }
-    )
-	} else {
-        $.post(
-            CONTEXT_PATH + "/unfollow",
-            {"entityType":3,"entityId":$(btn).prev().val()},
-            function(data){
-                data = JSON.parse(data);
-                if(data.code==0){
-                    window.location.reload();
-                }else {
-                    alert(data.msg);
-                }
-            }
-	}
+        },
+        "json"
+    );
 }

@@ -65,13 +65,7 @@
 				<div class="position-relative">
 					<ul class="nav nav-tabs">
 						<li class="nav-item">
-							<a class="nav-link active" href="profile.html">个人信息</a>
-						</li>
-						<li class="nav-item">
-							<a class="nav-link" href="my-post.html">我的帖子</a>
-						</li>
-						<li class="nav-item">
-							<a class="nav-link" href="my-reply.html">我的回复</a>
+							<a class="nav-link active" th:href="@{|/user/profile/${user.id}|}">个人信息</a>
 						</li>
 					</ul>
 				</div>
@@ -82,7 +76,8 @@
 						<h5 class="mt-0 text-warning">
 							<span th:utext="${user.username}">nowcoder</span>
                             <input type="hidden" th:value="${user.id}" id="entityId">
-							<button type="button" class="btn btn-info btn-sm float-right mr-5 follow-btn"
+							<button type="button" class="btn btn-sm float-right mr-5 follow-btn"
+                                th:classappend="${isFollowed?'btn-secondary':'btn-info'}"
                                 th:text="${isFollowed?'已关注':'关注TA'}" th:if="${thisuser!=null&&thisuser.id!=user.id}">关注TA</button>
 						</h5>
 						<div class="text-muted mt-3">

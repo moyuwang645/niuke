@@ -1,7 +1,7 @@
 $(function() {
-    $(topBtn).click(settop);
-    $(wonderfulBtn).click(setwonderful);
-    $(deleteBtn).click(setDelete);
+    $("#topBtn").click(settop);
+    $("#wonderfulBtn").click(setwonderful);
+    $("#deleteBtn").click(setDelete);
 })
 function like(btn,entityType,entityId,entityUserId,postId){
     $.post(

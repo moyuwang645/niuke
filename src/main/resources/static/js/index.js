@@ -12,14 +12,15 @@ function publish() {
             "content": content
         },
         function (data){
-            date=$.getJSON(data);
+            $("#hintModal .modal-body").text(data.msg);
             $("#hintModal").modal("show");
             setTimeout(function(){
                 $("#hintModal").modal("hide");
-                if(data.code==0)
+                if(data.code === 0)
                     window.location.reload();
             }, 2000);
-        }
+        },
+        "json"
 )
 
 }
