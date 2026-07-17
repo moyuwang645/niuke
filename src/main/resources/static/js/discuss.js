@@ -1,12 +1,12 @@
 $(function() {
-    $(topBtn).click(setTop);
-    $(wonderfulBtn).click(setwonderful);
-    $(deleteBtn).click(setdelete);
+    $("#topBtn").click(settop);
+    $("#wonderfulBtn").click(setwonderful);
+    $("#deleteBtn").click(setDelete);
 })
-function like(btn,entityType,entityId,entityUserId){
+function like(btn,entityType,entityId,entityUserId,postId){
     $.post(
         CONTEXT_PATH + '/like',
-        {"entityType=":entityType,"entityId":entityId,"entityUserId":entityUserId},
+        {"entityType":entityType,"entityId":entityId,"entityUserId":entityUserId,"postId":postId},
         function(data){
             data = JSON.parse(data);
             if(data.code==0){
@@ -57,7 +57,7 @@ function setDelete(){
         function(data){
             data = JSON.parse(data);
             if(data.code==0){
-                location.href=CONTEXT_PATH + "index";
+                location.href=CONTEXT_PATH + "/index";
             }else{
                 alert(data.message);
             }

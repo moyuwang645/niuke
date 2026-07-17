@@ -1,6 +1,5 @@
 package com.nowcoder.community.controller;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.nowcoder.community.entity.Message;
 import com.nowcoder.community.entity.Page;
@@ -11,6 +10,7 @@ import com.nowcoder.community.util.CommunityConstant;
 import com.nowcoder.community.util.CommunityUtil;
 import com.nowcoder.community.util.HostHolder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,8 +19,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.util.HtmlUtils;
 
-import java.security.Principal;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Controller
@@ -38,7 +36,7 @@ public class MessageController implements CommunityConstant {
         page.setPath("/letter/list");
         page.setRows(messageService.selectCountConversation(user.getId()));
         List<Message> conversationList=messageService.selectConversations(
-                user.getId(),page.getOffset(),page.getRows());
+                user.getId(),page.getOffset(),page.getLimit());
         List<Map<String,Object>> conversations=new ArrayList<>();
         if(conversationList!=null){
             for(Message message:conversationList){
@@ -58,13 +56,14 @@ public class MessageController implements CommunityConstant {
         model.addAttribute("TotalUnreadCount",TotalUnreadCount);
         return "site/letter";
     }
-    @RequestMapping(path = "/letter/detail/{convsersationId}",method = RequestMethod.GET)
-    public String detailletterList(@PathVariable("convsersationId") String convsersationId, Model model,Page page){
+    @RequestMapping(path = "/letter/detail/{conversationId}",method = RequestMethod.GET)
+    public String detailletterList(@PathVariable("conversationId") String conversationId, Model model,Page page){
+        User target = getLetterTarget(conversationId);
         page.setLimit(5);
-        page.setPath("/letter/list/"+convsersationId);
-        page.setRows(messageService.selectCountLetters(convsersationId));
+        page.setPath("/letter/detail/"+conversationId);
+        page.setRows(messageService.selectCountLetters(conversationId));
         List<Message> conversationList=messageService.selectLetters(
-                convsersationId, page.getOffset(), page.getLimit()
+                conversationId, page.getOffset(), page.getLimit()
         );
         List<Map<String,Object>> conversations=new ArrayList<>();
         if(conversationList!=null){
@@ -76,22 +75,33 @@ public class MessageController implements CommunityConstant {
             }
         }
         model.addAttribute("conversations",conversations);
-        model.addAttribute("target",getLetterTarget(convsersationId));
+        model.addAttribute("target",target);
         List<Integer> ids= getLetterIds(conversationList);
         if(!ids.isEmpty()){
             messageService.readMessage(ids);
         }
         return "site/letter-detail";
     }
-    private User getLetterTarget(String convsersationId){
-        String[] ids=convsersationId.split("_");
-        int d0=Integer.parseInt(ids[0]);
-        int d1=Integer.parseInt(ids[1]);
-        if(hostHolder.getUser().getId()==d0){
-            return userService.getUserByUserid(d1);
-        }else{
-            return userService.getUserByUserid(d0);
+    private User getLetterTarget(String conversationId){
+        User currentUser = hostHolder.getUser();
+        String[] ids = conversationId.split("_", -1);
+        if (currentUser == null || ids.length != 2) {
+            throw new AccessDeniedException("无权查看该私信");
         }
+
+        try {
+            int firstUserId = Integer.parseInt(ids[0]);
+            int secondUserId = Integer.parseInt(ids[1]);
+            if (currentUser.getId() == firstUserId) {
+                return userService.getUserByUserid(secondUserId);
+            }
+            if (currentUser.getId() == secondUserId) {
+                return userService.getUserByUserid(firstUserId);
+            }
+        } catch (NumberFormatException ignored) {
+            // Invalid conversation IDs are handled as unauthorized requests below.
+        }
+        throw new AccessDeniedException("无权查看该私信");
     }
 
     private List<Integer> getLetterIds(List<Message> conversationList){
@@ -127,7 +137,7 @@ public class MessageController implements CommunityConstant {
         messageService.addMessage(message);
         return CommunityUtil.getJSONString(0);
     }
-    @RequestMapping(path = "notice/list",method = RequestMethod.GET)
+    @RequestMapping(path = "/notice/list",method = RequestMethod.GET)
     public String getnoticeList(Model model){
         User user=hostHolder.getUser();
 
@@ -143,7 +153,7 @@ public class MessageController implements CommunityConstant {
             CommentmessageVo.put("postId",data.get("postId"));
             int count=messageService.selectNoticeCount(user.getId(),Comment);
             CommentmessageVo.put("count",count);
-            int UnreadCount=messageService.selectUnreadCount(user.getId(),Comment);
+            int UnreadCount=messageService.selectNoticeUnreadCount(user.getId(),Comment);
             CommentmessageVo.put("UnreadCount",UnreadCount);
         }
         model.addAttribute("CommentNotice",CommentmessageVo);
@@ -159,7 +169,7 @@ public class MessageController implements CommunityConstant {
             LikemessageVo.put("postId",data.get("postId"));
             int count=messageService.selectNoticeCount(user.getId(),Like);
             LikemessageVo.put("count",count);
-            int UnreadCount=messageService.selectUnreadCount(user.getId(),Like);
+            int UnreadCount=messageService.selectNoticeUnreadCount(user.getId(),Like);
             LikemessageVo.put("UnreadCount",UnreadCount);
         }
         model.addAttribute("LikeNotice",LikemessageVo);
@@ -174,15 +184,15 @@ public class MessageController implements CommunityConstant {
             FollowmessageVo.put("entityId",data.get("entityId"));
             int count=messageService.selectNoticeCount(user.getId(),Follow);
             FollowmessageVo.put("count",count);
-            int UnreadCount=messageService.selectUnreadCount(user.getId(),Follow);
+            int UnreadCount=messageService.selectNoticeUnreadCount(user.getId(),Follow);
             FollowmessageVo.put("UnreadCount",UnreadCount);
         }
         model.addAttribute("FollowNotice",FollowmessageVo);
         int TotalUnreadCount=messageService.selectNoticeUnreadCount(user.getId(),null);
         model.addAttribute("TotalUnreadCount",TotalUnreadCount);
-        int TotalUnreadLetterCount=messageService.selectUnreadCount(user.getId(),null);
-        model.addAttribute("TotalUnreadLetterCount",TotalUnreadLetterCount);
-        return "/site/notice";
+        int UnreadConversationCount=messageService.selectUnreadCount(user.getId(),null);
+        model.addAttribute("UnreadConversationCount",UnreadConversationCount);
+        return "site/notice";
     }
     @RequestMapping(path = "/notice/detail/{topic}", method = RequestMethod.GET)
     public String getNoticeDetail(@PathVariable("topic") String topic, Model model, Page page){
@@ -190,7 +200,7 @@ public class MessageController implements CommunityConstant {
         page.setLimit(5);
         page.setPath("/notice/detail/"+topic);
         page.setRows(messageService.selectNoticeCount(user.getId(),topic));
-        List<Message> noticeList=messageService.selectNotice(user.getId(),topic,page.getOffset(),page.getRows());
+        List<Message> noticeList=messageService.selectNotice(user.getId(),topic,page.getOffset(),page.getLimit());
         List<Map<String,Object>> messageVo=new ArrayList<>();
         if(noticeList!=null){
             for(Message message:noticeList){
@@ -207,10 +217,11 @@ public class MessageController implements CommunityConstant {
             }
         }
         model.addAttribute("NoticeDetail",messageVo);
+        model.addAttribute("topic",topic);
         List<Integer> ids= getLetterIds(noticeList);
         if (!ids.isEmpty()) {
             messageService.readMessage(ids);
         }
-        return "/site/notice-detail";
+        return "site/notice-detail";
     }
 }

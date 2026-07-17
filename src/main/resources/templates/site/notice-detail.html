@@ -84,23 +84,23 @@
 								</button>
 							</div>
 							<div class="toast-body">
-								<span th:if="topic.equals('comment')">
+								<span th:if="${topic == 'comment'}">
                                     用户
                                     <i th:text="${notice.user.username}">nowcoder</i>
                                     评论了你的<b th:text="${notice.entityType==1?'帖子':'回复'}">帖子</b>,
-                                    <a class="text-primary" th:href="@{|/discuss/detail/${noctice.postId}|}">点击查看</a> !
+                                    <a class="text-primary" th:href="@{|/discuss/detail/${notice.postId}|}">点击查看</a> !
                                 </span>
-                                <span th:if="topic.equals('like')">
+                                <span th:if="${topic == 'like'}">
                                     用户
                                     <i th:text="${notice.user.username}">nowcoder</i>
-                                    评论了你的<b th:text="${notice.entityType==1?'帖子':'回复'}">帖子</b>,
-                                    <a class="text-primary" th:href="@{|/discuss/detail/${noctice.postId}|}">点击查看</a> !
+                                    点赞了你的<b th:text="${notice.entityType==1?'帖子':'回复'}">帖子</b>,
+                                    <a class="text-primary" th:href="@{|/discuss/detail/${notice.postId}|}">点击查看</a> !
                                 </span>
-                                <span th:if="topic.equals('follow')">
+                                <span th:if="${topic == 'follow'}">
                                     用户
                                     <i th:text="${notice.user.username}">nowcoder</i>
                                     关注了你,
-                                    <a class="text-primary" th:href="@{|/user/profile/${noctice.user.id}|}">点击查看</a> !
+                                    <a class="text-primary" th:href="@{|/user/profile/${notice.user.id}|}">点击查看</a> !
                                 </span>
 							</div>
 						</div>

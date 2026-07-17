@@ -123,7 +123,7 @@
 				<ul class="list-unstyled">
 					<li class="media pb-3 pt-3 mb-3 border-bottom position-relative" th:each="letter:${conversations}">
 						<span class="badge badge-danger" th:text="${letter.UnreadLetter}" th:if="${letter.UnreadLetter==0}"></span>
-						<a href="profile.html">
+						<a th:href="@{|/user/profile/${letter.target.id}|}">
 							<img th:src="${letter.target.headerUrl}" class="mr-4 rounded-circle user-header" alt="用户头像" >
 						</a>
 						<div class="media-body">

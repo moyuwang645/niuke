@@ -62,10 +62,9 @@ public class SensitiveFilter {
                 if(temp==root){
                     sb.append(c);
                     begin++;
-                }else{
-                    end++;
-                    continue;
                 }
+                end++;
+                continue;
             }
             temp =temp.getSubnode(c);
             if(temp==null){

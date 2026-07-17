@@ -20,7 +20,7 @@ public class MessageInterceptor implements HandlerInterceptor {
     @Override
     public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,ModelAndView modelAndView) throws Exception {
         User user=hostHolder.getUser();
-        if(user==null)
+        if(user!=null&&modelAndView!=null)
         {
             int UnreadNotice =messageService.selectNoticeUnreadCount(user.getId(), null);
             int UnreadLetter =messageService.selectUnreadCount(user.getId(), null);

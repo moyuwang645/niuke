@@ -13,8 +13,8 @@ public interface LoginTicketMapping {
     int insertLoginTicket(LoginTicket loginTicket);
     @Select({"select id,user_id,ticket,status,expired",
              "from login_ticket where ticket=#{ticket}"})
-    LoginTicket selectLoginTicket(String ticket);
+    LoginTicket selectLoginTicket(@Param("ticket") String ticket);
     @Update({"update login_ticket set status=#{status} where ticket=#{ticket}"})
-    int updateLoginTicket(String ticket, int status);
+    int updateLoginTicket(@Param("ticket") String ticket, @Param("status") int status);
 
 }

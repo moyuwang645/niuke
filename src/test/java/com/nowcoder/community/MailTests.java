@@ -1,6 +1,7 @@
 package com.nowcoder.community;
 
 import com.nowcoder.community.util.MailClient;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import org.thymeleaf.spring5.SpringTemplateEngine;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @ContextConfiguration(classes = CommunityApplication.class)
+@Ignore("Requires configured SMTP credentials and sends real email.")
 public class MailTests {
     @Autowired
     private MailClient mailClient;

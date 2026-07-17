@@ -2,10 +2,8 @@ package com.nowcoder.community.service;
 
 import com.nowcoder.community.entity.User;
 import com.nowcoder.community.util.CommunityConstant;
-import com.nowcoder.community.util.CommunityUtil;
 import com.nowcoder.community.util.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -27,8 +25,8 @@ public class FollowService implements CommunityConstant {
                 String followerKey= RedisUtil.getFollower(entityType,entityId);
                 String followeeKey=RedisUtil.getFollowee(userId,entityType);
                 redisOperations.multi();
-                redisOperations.opsForSet().add(followerKey,userId,System.currentTimeMillis());
-                redisOperations.opsForSet().add(followeeKey,entityId,System.currentTimeMillis());
+                redisOperations.opsForZSet().add(followerKey,userId,System.currentTimeMillis());
+                redisOperations.opsForZSet().add(followeeKey,entityId,System.currentTimeMillis());
                 return redisOperations.exec();
             }
         });{
@@ -41,8 +39,8 @@ public class FollowService implements CommunityConstant {
                 String followerKey= RedisUtil.getFollower(entityType,entityId);
                 String followeeKey=RedisUtil.getFollowee(userId,entityType);
                 redisOperations.multi();
-                redisOperations.opsForSet().add(followerKey,userId);
-                redisOperations.opsForSet().add(followeeKey,entityId);
+                redisOperations.opsForZSet().remove(followerKey,userId);
+                redisOperations.opsForZSet().remove(followeeKey,entityId);
                 return redisOperations.exec();
             }
         });{
@@ -69,7 +67,7 @@ public class FollowService implements CommunityConstant {
         List<Map<String,Object>> followeeList=new ArrayList<Map<String,Object>>();
         for(Integer id:ids){
             Map<String,Object> map=new HashMap<>();
-            User user=userService.getUserByUserid(userId);
+            User user=userService.getUserByUserid(id);
             map.put("user",user);
             double score=redisTemplate.opsForZSet().score(followeeKey,id);
             map.put("followTime",new Date((long)score));
@@ -86,7 +84,7 @@ public class FollowService implements CommunityConstant {
         List<Map<String,Object>> followerList=new ArrayList<Map<String,Object>>();
         for(Integer id:ids){
             Map<String,Object> map=new HashMap<>();
-            User user=userService.getUserByUserid(userId);
+            User user=userService.getUserByUserid(id);
             map.put("user",user);
             double score=redisTemplate.opsForZSet().score(followerKey,id);
             map.put("followTime",new Date((long)score));

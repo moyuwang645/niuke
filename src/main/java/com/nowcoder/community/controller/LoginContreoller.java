@@ -44,12 +44,12 @@ public class LoginContreoller implements CommunityConstant {
 
     @RequestMapping(path = "/register",method = RequestMethod.GET)
     public String getResgterPage(){
-        return "/site/register";
+        return "site/register";
     }
 
     @RequestMapping(path = "/login",method = RequestMethod.GET)
     public String getloginPage(){
-        return "/site/login";
+        return "site/login";
     }
     @RequestMapping(path="/register",method = RequestMethod.POST)
     public String register(Model model, User user){
@@ -101,7 +101,7 @@ public class LoginContreoller implements CommunityConstant {
         String kaptcha=(String) session.getAttribute("kaptcha");
         if(StringUtils.isEmpty(kaptcha)||!kaptcha.equalsIgnoreCase(code)||StringUtils.isEmpty(code)){
             model.addAttribute("codemsg","验证码不正确");
-            return "/site/login";
+            return "site/login";
         }
         int expiredtime = remember?MAX_REMEMBER_TIME_REMEBER:MAX_REMEMBER_TIME;
         Map<String,Object> map = userService.LoginService(username,password,expiredtime);
@@ -114,7 +114,7 @@ public class LoginContreoller implements CommunityConstant {
         }else{
             model.addAttribute("usermsg",map.get("usermsg"));
             model.addAttribute("passwordmsg",map.get("passwordmsg"));
-            return  "/site/login";
+            return  "site/login";
         }
     }
 
