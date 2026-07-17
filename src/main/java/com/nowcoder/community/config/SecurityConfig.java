@@ -1,13 +1,17 @@
 package com.nowcoder.community.config;
 
+import com.nowcoder.community.service.UserService;
 import com.nowcoder.community.util.CommunityConstant;
 import com.nowcoder.community.util.CommunityUtil;
+import com.nowcoder.community.util.HostHolder;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.access.AccessDeniedHandler;
 
@@ -19,41 +23,50 @@ import java.io.PrintWriter;
 
 @Configuration
 public class SecurityConfig extends WebSecurityConfigurerAdapter implements CommunityConstant {
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private HostHolder hostHolder;
+
     @Override
     public void configure(WebSecurity web) throws Exception {
         web.ignoring().antMatchers("/resources/**");
     }
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+        http.addFilterBefore(
+                new LoginTicketFilter(userService, hostHolder),
+                UsernamePasswordAuthenticationFilter.class);
         http.authorizeRequests()
                 .antMatchers(
-                        "community/user/setting",
-                        "community/user/update",
-                        "community/comment/add/",
-                        "community/discuss/add",
-                        "community/letter/**",
-                        "community/notice/**",
-                        "community/like",
-                        "community/follow",
-                        "community/Unfollow"
+                        "/user/setting",
+                        "/user/update",
+                        "/comment/add/**",
+                        "/discuss/add",
+                        "/letter/**",
+                        "/notice/**",
+                        "/like",
+                        "/follow",
+                        "/unfollow"
                 ).hasAnyAuthority(
                         AuthorityUser,
                         AuthorityAdmin,
                         AuthorityModerator
                 )
                 .antMatchers(
-                        "community/discuss/top",
-                        "community/discuss/wonderful"
+                        "/discuss/top",
+                        "/discuss/wonderful"
                 ).hasAnyAuthority(
                         AuthorityModerator
                 )
                 .antMatchers(
-                        "community/discuss/delete"
+                        "/discuss/delete"
                 ).hasAnyAuthority(
                         AuthorityModerator,
                         AuthorityAdmin
                 )
                 .anyRequest().permitAll();
+        http.csrf().disable();
         http.exceptionHandling()
                 .authenticationEntryPoint(new AuthenticationEntryPoint() {
                     @Override

@@ -3,7 +3,6 @@ package com.nowcoder.community.service;
 import com.nowcoder.community.util.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
-import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.SessionCallback;
@@ -22,11 +21,11 @@ public class LikeService {
                 boolean isMember=operations.opsForSet().isMember(likeEntityKey,userId);
                 operations.multi();
                 if(!isMember){
-                    operations.opsForSet().add(userLikeKey,userId);
-                    operations.opsForValue().increment(likeEntityKey,userId);
+                    operations.opsForSet().add(likeEntityKey,userId);
+                    operations.opsForValue().increment(userLikeKey);
                 }else {
-                    operations.opsForSet().remove(userLikeKey,userId);
-                    operations.opsForValue().decrement(likeEntityKey,userId);
+                    operations.opsForSet().remove(likeEntityKey,userId);
+                    operations.opsForValue().decrement(userLikeKey);
                 }
                 return operations.exec();
             }
@@ -42,7 +41,7 @@ public class LikeService {
     }
     public int findLikeCount(int entityuUserId){
         String userLikeKey=RedisUtil.getUserLike(entityuUserId);
-        Integer count=(Integer)redisTemplate.opsForValue().get(userLikeKey);
+        Number count=(Number)redisTemplate.opsForValue().get(userLikeKey);
         return count==null?0:count.intValue();
     }
 }

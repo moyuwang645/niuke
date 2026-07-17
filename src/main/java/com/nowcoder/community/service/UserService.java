@@ -15,7 +15,6 @@ import org.springframework.util.StringUtils;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
-import javax.xml.crypto.Data;
 import java.util.*;
 
 @Service
@@ -60,7 +59,7 @@ public class UserService  implements CommunityConstant {
         }
         u=userMapper.selectByEmail(user.getEmail());
         if(u!=null) {
-            map.put("usermail","邮箱已注册");
+            map.put("mailmsg","邮箱已注册");
             return map;
         }
 
@@ -69,6 +68,8 @@ public class UserService  implements CommunityConstant {
         user.setHeaderUrl(String.format("http://images.nowcoder.com/head/%dt.png",new Random().nextInt(1000)));
         user.setStatus(0);
         user.setType(0);
+        user.setActivationCode(CommunityUtil.generateUUID());
+        user.setCreateTime(new Date());
         userMapper.insertUser(user);
 
         Context context=new Context();
@@ -81,10 +82,13 @@ public class UserService  implements CommunityConstant {
     }
     public int activation(int userid,String code){
         User user=userMapper.selectById(userid);
+        if(user==null){
+            return activation_fail;
+        }
         if(user.getStatus()==1){
             return activation_repeat;
-        } else if (user.getActivationCode().equals(code)) {
-            user.setStatus(1);
+        } else if (user.getActivationCode()!=null&&user.getActivationCode().equals(code)) {
+            userMapper.updateStatus(userid,1);
             return activation_success;
         }else{
             return activation_fail;
@@ -116,7 +120,7 @@ public class UserService  implements CommunityConstant {
         LoginTicket loginTicket=new LoginTicket();
         loginTicket.setTicket(CommunityUtil.generateUUID());
         loginTicket.setUserId(user.getId());
-        loginTicket.setExpire(new Date(System.currentTimeMillis()+expireddata));
+        loginTicket.setExpire(new Date(System.currentTimeMillis()+expireddata * 1000L));
         loginTicket.setStatus(0);
         loginTicketMapping.insertLoginTicket(loginTicket);
         map.put("ticket",loginTicket.getTicket());

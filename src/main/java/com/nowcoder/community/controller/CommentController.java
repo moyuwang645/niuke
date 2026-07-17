@@ -39,10 +39,11 @@ public class CommentController implements CommunityConstant {
         comment.setCreateTime(new Date());
         commentService.addComment(comment);
         Event event=new Event()
+                .setTopic(Comment)
                 .setUserId(hostHolder.getUser().getId())
                 .setEntityType(comment.getEntityType())
                 .setEntityId(comment.getEntityId())
-                .setMap("discussPostId",discussPostId);
+                .setMap("postId",discussPostId);
         if(comment.getEntityType()==CommentType){
             DiscussPost discussPost=discussPostService.getDiscussPostById(comment.getEntityId());
             event.setEntityUserId(discussPost.getUserid());

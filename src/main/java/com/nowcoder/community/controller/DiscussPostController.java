@@ -24,7 +24,7 @@ import java.util.*;
 import static com.nowcoder.community.util.CommunityConstant.*;
 
 @Controller
-@RequestMapping(path = "discuss")
+@RequestMapping(path = "/discuss")
 public class DiscussPostController {
     @Autowired
     private DiscussPostService discussPostService;
@@ -110,7 +110,7 @@ public class DiscussPostController {
                         replyVOList.add(replyVO);
                     }
                 commentVO.put("replys",replyVOList);
-                int replyCount=commentService.countCommentService(ReplyType,comment.getUserId());
+                int replyCount=commentService.countCommentService(ReplyType,comment.getId());
                 commentVO.put("replyCount",replyCount);
                 commentVOList.add(commentVO);
             }

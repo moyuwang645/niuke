@@ -31,7 +31,7 @@ public class LikeContorller implements CommunityConstant {
     private RedisTemplate redisTemplate;
     @RequestMapping(path = "/like",method = RequestMethod.POST)
     @ResponseBody
-    public String like(int entityType,int entityId,int entityUserId){
+    public String like(int entityType,int entityId,int entityUserId,int postId){
         User user=hostHolder.getUser();
         likeService.like(user.getId(),entityType,entityId,entityUserId);
         long likecount=likeService.likeCount(entityType,entityId);
@@ -45,13 +45,13 @@ public class LikeContorller implements CommunityConstant {
                     .setEntityId(entityId)
                     .setEntityType(entityType)
                     .setEntityUserId(entityUserId)
-                    .setMap("postId",entityId)
+                    .setMap("postId",postId)
                     .setTopic(Like);
             eventProducer.fireEvent(event);
         }
         if(entityType==CommentType){
             String redisKey= RedisUtil.getPostScore();
-            redisTemplate.opsForSet().add(redisKey, entityId);
+            redisTemplate.opsForSet().add(redisKey, postId);
         }
         return CommunityUtil.getJSONString(0,null,map);
     }

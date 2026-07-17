@@ -32,9 +32,9 @@ public class EventConsumer implements CommunityConstant {
     @Autowired
     private HostHolder hostHolder;
 
-    @KafkaListener(topics={Comment,Follow,Like})
+    @KafkaListener(topics={Comment,Follow,Like}, groupId = "community-notice-consumer")
     public void handleMessage(ConsumerRecord record) {
-        if(record.value()==null||record==null){
+        if(record==null||record.value()==null){
             logger.error("消息为空");
             return;
         }
@@ -53,16 +53,16 @@ public class EventConsumer implements CommunityConstant {
         content.put("entityType",event.getEntityType());
         content.put("entityId",event.getEntityId());
         if(!event.getMap().isEmpty()){
-            for(Map.Entry<String,Object> entry:content.entrySet()){
+            for(Map.Entry<String,Object> entry:event.getMap().entrySet()){
                 content.put(entry.getKey(),entry.getValue());
             }
         }
         message.setContent(JSONObject.toJSONString(content));
         messageService.addMessage(message);
     }
-    @KafkaListener(topics = {Publish})
+    @KafkaListener(topics = {Publish}, groupId = "community-publish-consumer")
     public void handlePublish(ConsumerRecord record) {
-        if(record.value()==null||record==null){
+        if(record==null||record.value()==null){
             logger.error("消息为空");
             return;
         }
@@ -75,9 +75,9 @@ public class EventConsumer implements CommunityConstant {
         elasticsearchService.saveDiscussPost(discussPost);
     }
 
-    @KafkaListener(topics = {Delete})
+    @KafkaListener(topics = {Delete}, groupId = "community-delete-consumer")
     public void handleDelete(ConsumerRecord record) {
-        if(record.value()==null||record==null){
+        if(record==null||record.value()==null){
             logger.error("消息为空");
             return;
         }

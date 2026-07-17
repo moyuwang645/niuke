@@ -4,7 +4,6 @@ import com.nowcoder.community.dao.CommentMapper;
 import com.nowcoder.community.dao.DiscussPostMapper;
 import com.nowcoder.community.entity.Comment;
 import com.nowcoder.community.util.SensitiveFilter;
-import org.apache.ibatis.transaction.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -12,7 +11,6 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.util.HtmlUtils;
 
-import javax.servlet.http.HttpUtils;
 import java.util.List;
 
 import static com.nowcoder.community.util.CommunityConstant.CommentType;
@@ -36,7 +34,7 @@ public class CommentService {
         if(comment == null){
             throw new IllegalArgumentException("无评论");
         }
-        comment.setContent(HtmlUtils.htmlUnescape(comment.getContent()));
+        comment.setContent(HtmlUtils.htmlEscape(comment.getContent()));
         comment.setContent(sensitiveFilter.filter(comment.getContent()));
         int row=commentMapper.insertComment(comment);
         if(comment.getEntityType()==CommentType){

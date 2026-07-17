@@ -79,7 +79,7 @@ public class ElasticsearchService {
                     }
                     HighlightField contentField=hit.getHighlightFields().get("content");
                     if (contentField != null) {
-                        discussPost.setTitle(contentField.getFragments()[0].toString());
+                        discussPost.setContent(contentField.getFragments()[0].toString());
                     }
                     list.add(discussPost);
                 }

@@ -43,8 +43,9 @@ public class HomeController implements CommunityConstant {
                 map.put("post",post);
                 User user=userService.getUserByUserid(post.getUserid());
                 map.put("user",user);
+                User currentUser = hostHolder.getUser();
                 long likeCount=likeService.likeCount(CommentType,post.getId());
-                int likeStatus=likeService.findLikeStatus(hostHolder.getUser().getId(),CommentType,post.getId());
+                int likeStatus=currentUser==null?0:likeService.findLikeStatus(currentUser.getId(),CommentType,post.getId());
                 map.put("likeCount",likeCount);
                 map.put("likeStatus",likeStatus);
                 discussPosts.add(map);
@@ -52,11 +53,11 @@ public class HomeController implements CommunityConstant {
         }
         model.addAttribute("discussPosts",discussPosts);
         model.addAttribute("orderMode",orderMode);
-        return "/index";
+        return "index";
     }
     @RequestMapping(path = "/denied",method = RequestMethod.GET)
     public String getDenied(){
-        return "/error/404";
+        return "site/error/404";
     }
 
 }
